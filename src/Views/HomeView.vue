@@ -1,3 +1,7 @@
+<script setup>
+import BannerComponent from '@/components/BannerComponent.vue';
+</script>
+
 <template>
-    <h1>Home</h1>
+<BannerComponent />
 </template>
