@@ -5,57 +5,124 @@ import { onMounted, computed } from 'vue';
 const store = useTendenciasStore();
 
 onMounted(() => {
-    store.getAllTendencias();
+  store.getAllTendencias();
 });
 
 const filmes = computed(() => store.tendencias.filter(item => item.title));
 </script>
 
 <template>
-    <main>
-        <h1>TENDÊNCIAS</h1>
-        <ul>
-            <li v-for="filme in filmes" :key="filme.id">
-                <img :src="'https://image.tmdb.org/t/p/w500' + filme.poster_path" :alt="filme.title" />
-                <p>{{ filme.title }}</p>
-                <div class="informacao">
-                    <p>{{ filme.release_date }}</p>
-                    <p>Ver</p>
-                </div>
-            </li>
-        </ul>
-    </main>
+  <main>
+    <h1>TENDÊNCIAS</h1>
+
+    <div class="slider">
+      <div class="track">
+        <div class="card" v-for="filme in [...filmes, ...filmes]" :key="filme.id + Math.random()">
+          <img
+            :src="'https://image.tmdb.org/t/p/w500' + filme.poster_path"
+            :alt="filme.title"
+          />
+          <p class="titulo">{{ filme.title }}</p>
+          <div class="informacao">
+            <p>{{ filme.release_date }}</p>
+            <p>Ver</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
 </template>
 
 <style scoped>
-main{
-  background: linear-gradient(to right, #44001a3d 0%, #C99BA6 100%);
+main {
+  background: linear-gradient(to right, #44001a3d 0%, #c99ba6 100%);
+  padding: 2rem 0;
+  overflow: hidden;
+  text-align: center;
 }
-h1{
-  font-size: 2rem ;
+
+h1 {
+  font-size: 2rem;
   font-weight: 700;
-    --bg-size: 400%;
-    --color-one: #44001A;
-    --color-two: #AA0041;
-    background: linear-gradient(90deg,
-            var(--color-one),
-            var(--color-two),
-            var(--color-one)) 0 0 / var(--bg-size) 100%;
-
-    color: transparent;
-    -webkit-background-clip: text;
-    background-clip: text;
-
-    animation: move-bg 8s infinite linear;
+  --bg-size: 400%;
+  --color-one: #44001a;
+  --color-two: #aa0041;
+  background: linear-gradient(
+      90deg,
+      var(--color-one),
+      var(--color-two),
+      var(--color-one)
+    )
+    0 0 / var(--bg-size) 100%;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: move-bg 8s infinite linear;
+  margin-bottom: 2rem;
 }
 
 @keyframes move-bg {
-    0% {
-        background-position: 0 0;
-    }
+  0% { background-position: 0 0; }
+  100% { background-position: var(--bg-size) 0; }
+}
 
-    100% {
-        background-position: var(--bg-size) 0;
-    }
-};
+.slider {
+  width: 100%;
+  overflow: hidden;
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  animation: scroll 40s linear infinite;
+}
+
+.track:hover {
+  animation-play-state: paused;
+}
+
+.card {
+  position: relative;
+  list-style: none;
+  flex: 0 0 auto;
+  width: 200px;
+  margin: 0 1vw;
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.card img {
+  width: 100%;
+  border-radius: 8px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: scale(1.09);
+  transition: 1s;
+
+  & p {
+    display: none;
+  }
+}
+
+.titulo {
+  margin: 0.5rem 0 0 0;
+  font-weight: 500;
+  white-space: normal;
+  text-align: left;
+}
+
+.informacao {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #44001a;
+}
+
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
 </style>
