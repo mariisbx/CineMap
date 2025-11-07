@@ -29,7 +29,7 @@ main{
     margin-top: -3vw
 }
 img{
-    width: 60vw;
+    width: 53vw;
     height: auto;
 }
 .principal{
@@ -37,7 +37,7 @@ img{
     flex-direction: column;
     justify-content: center;
     gap: 1rem;
-    margin-left: 7.5vw;
+    margin-left: 9vw;
 }
 h1{
    font-size: 2.5rem;
