@@ -25,7 +25,7 @@ const filmes = computed(() => store.tendencias.filter(item => item.title));
           <p class="titulo">{{ filme.title }}</p>
           <div class="informacao">
             <p>{{ filme.release_date }}</p>
-            <p>Ver</p>
+            <p class="ver">Ver</p>
           </div>
         </div>
       </div>
@@ -81,7 +81,7 @@ h1 {
   animation-play-state: paused;
 }
 
-.card {
+  .card {
   position: relative;
   list-style: none;
   flex: 0 0 auto;
@@ -89,6 +89,9 @@ h1 {
   margin: 0 1vw;
   text-align: center;
   transition: transform 0.3s ease;
+  display: flex; 
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .card img {
@@ -100,25 +103,48 @@ h1 {
 .card:hover {
   transform: scale(1.09);
   transition: 1s;
-
+   border-radius: 8px;
   & p {
     display: none;
+  }
+  & .ver{
+    display: block; 
+    color: white;
+    background-color: #44001a;
+    padding: 6px 88px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+      transform: translate(0%, -140%) scale(1.05);
+  }
+  & .ver:hover {
+    background-color: #350114;
+    transition: 1s;
   }
 }
 
 .titulo {
-  margin: 0.5rem 0 0 0;
-  font-weight: 500;
+  margin: 0.5rem 0 1rem 0;
+  font-weight: 700;
   white-space: normal;
   text-align: left;
+
 }
 
 .informacao {
   display: flex;
   justify-content: space-between;
-  margin-top: 0.5rem;
   font-size: 0.9rem;
-  color: #44001a;
+  text-align: end;
+  margin-top: 0.5rem;
+  width: 100%;
+}
+
+.ver {
+  background-color: #44001a;
+  color: white;
+  padding: 4px 30px;
+  border-radius: 4px;
 }
 
 @keyframes scroll {
