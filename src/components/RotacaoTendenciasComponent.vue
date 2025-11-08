@@ -84,7 +84,7 @@ h3{
 }
 .botoes {
     display: inline-block;
-    margin: 24px 10px 24px 0;
+    margin: 24px 10px 0 0;
     padding: 6px 30px;
     border-radius: 8px;
     font-size: 1rem;
@@ -92,6 +92,7 @@ h3{
 }
 button{
     width: 100%;
+    margin-top: 24px;
     padding: 5px;
     font-size: 1.07rem;
     border: none;
