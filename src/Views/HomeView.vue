@@ -3,6 +3,7 @@ import BannerComponent from '@/components/BannerComponent.vue';
 import CarrosselComponent from '@/components/CarrosselComponent.vue';
 import RotacaoTendenciasComponent from '@/components/RotacaoTendenciasComponent.vue';
 import AvaliationComponent from '@/components/AvaliationComponent.vue';
+import ActorsComponent from '@/components/ActorsComponent.vue';
 </script>
 
 <template>
@@ -10,4 +11,5 @@ import AvaliationComponent from '@/components/AvaliationComponent.vue';
 <CarrosselComponent />
 <RotacaoTendenciasComponent />
 <AvaliationComponent />
+<ActorsComponent />
 </template>
