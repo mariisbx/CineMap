@@ -28,7 +28,13 @@ onBeforeUnmount(() => {
                     <h3>{{ store.filmeAtual.title }}</h3>
                     <p class="data">{{ store.filmeAtual.release_date}}</p>
                     <p class="descricao">{{ store.filmeAtual.overview }}</p>
+
+                    <div class="botoes" v-for="generos in store.filmeAtual.genres" :key="generos.id">
+                        <p>{{ generos.name }}</p>
+                    </div>
+
                 </div>
+                 <button>Ver Filme</button>
             </div>
 
         </div>
@@ -75,5 +81,27 @@ h3{
     margin-top: 20px;
     font-size: 1.2rem;
     line-height: 1.4;
+}
+.botoes {
+    display: inline-block;
+    margin: 24px 10px 24px 0;
+    padding: 6px 30px;
+    border-radius: 8px;
+    font-size: 1rem;
+    background-color: #44001A;
+}
+button{
+    width: 100%;
+    padding: 5px;
+    font-size: 1.07rem;
+    border: none;
+    border-radius: 6px;
+    background-color: #c99ba693;
+    color: white;
+}
+button:hover{
+    background-color: #c99ba6c2;
+    transition: 1s;
+    cursor: pointer;
 }
 </style>
