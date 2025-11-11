@@ -12,14 +12,12 @@ onMounted(async () => {
   await store.listMovies(1, [])
 })
 
-// mudar página (usa os filtros ativos)
 const mudarPagina = async (page) => {
   if (page < 1 || page > store.totalPages) return
   pageAtual.value = page
   await store.listMovies(page, store.filtrosAtivos.value)
 }
 
-// aplicar filtros
 const aplicarFiltros = async () => {
   const idsSelecionados = store.genres
     .filter(g => g.selecionado)
@@ -31,7 +29,6 @@ const aplicarFiltros = async () => {
   mostrarFiltros.value = false
 }
 
-// limpar filtros
 const limparFiltros = async () => {
   store.genres.forEach(g => (g.selecionado = false))
   store.filtrosAtivos.value = []
@@ -47,7 +44,6 @@ const generosFiltrados = computed(() =>
 
 <template>
   <main>
-    <!-- Filtro -->
     <div class="filtros-container">
       <button class="botao-filtro" @click="mostrarFiltros = !mostrarFiltros">
         Filtrar Gêneros ▾
@@ -75,7 +71,6 @@ const generosFiltrados = computed(() =>
       </div>
     </div>
 
-    <!-- Lista de filmes -->
     <ul class="lista-filmes">
       <li v-for="filme in store.movies" :key="filme.id">
         <img :src="'https://image.tmdb.org/t/p/w500' + filme.poster_path" :alt="filme.title" />
@@ -85,7 +80,6 @@ const generosFiltrados = computed(() =>
       </li>
     </ul>
 
-    <!-- Paginação -->
     <div v-if="store.movies.length" class="pagination">
       <button @click="mudarPagina(pageAtual - 1)" :disabled="pageAtual === 1">←</button>
 
@@ -104,24 +98,40 @@ const generosFiltrados = computed(() =>
 </template>
 
 <style scoped>
-/* Container principal */
 .filtros-container {
   position: relative;
   margin-bottom: 30px;
   margin-left: 5%;
 }
 
-/* Botão de abrir/fechar filtros */
 .botao-filtro {
   background: none;
   border: none;
   font-weight: 600;
-  font-size: 1.1rem;
-  color: #44001a;
   cursor: pointer;
+ font-weight: 600;
+  font-size: 1.34rem;
+   --bg-size: 400%;
+  --color-one: #44001a;
+  --color-two: #aa0041;
+  background: linear-gradient(
+      90deg,
+      var(--color-one),
+      var(--color-two),
+      var(--color-one)
+    )
+    0 0 / var(--bg-size) 100%;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: move-bg 8s infinite linear;
 }
 
-/* Caixa flutuante dos filtros */
+@keyframes move-bg {
+  0% { background-position: 0 0; }
+  100% { background-position: var(--bg-size) 0; }
+}
+
 .caixa-filtros {
   position: absolute;
   top: 35px;
@@ -134,7 +144,7 @@ const generosFiltrados = computed(() =>
   z-index: 10;
 }
 
-/* Cabeçalho da caixa de filtros */
+
 .topo-filtro {
   display: flex;
   justify-content: space-between;
@@ -147,7 +157,6 @@ const generosFiltrados = computed(() =>
   color: #44001a;
 }
 
-/* Botão de limpar */
 .botao-limpar {
   background: none;
   border: none;
@@ -156,7 +165,6 @@ const generosFiltrados = computed(() =>
   cursor: pointer;
 }
 
-/* Campo de busca */
 .campo-busca {
   width: 100%;
   padding: 5px 8px;
@@ -166,7 +174,6 @@ const generosFiltrados = computed(() =>
   margin-bottom: 10px;
 }
 
-/* Lista de checkboxes */
 .lista-filtros {
   list-style: none;
   padding: 0;
@@ -180,7 +187,7 @@ const generosFiltrados = computed(() =>
   font-size: 0.95rem;
 }
 
-/* Botão aplicar */
+
 .botao-aplicar {
   background: #44001a;
   color: white;
@@ -197,7 +204,6 @@ const generosFiltrados = computed(() =>
   transition: 0.3s;
 }
 
-/* Lista de filmes */
 .lista-filmes {
   display: flex;
   flex-wrap: wrap;
@@ -237,11 +243,11 @@ p {
   color: white;
   cursor: pointer;
 }
-button:hover {
+.lista-filmes button:hover {
   background-color: #2e0012;
   transition: 1s;
 }
-/* Paginação */
+
 .pagination {
   display: flex;
   justify-content: center;

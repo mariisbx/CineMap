@@ -1,3 +1,7 @@
+<script setup>
+import AtoresComponent from '@/components/AtoresComponent.vue';
+</script>
+
 <template>
-    <h1>Atores</h1>
+    <AtoresComponent />
 </template>
