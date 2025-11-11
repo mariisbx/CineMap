@@ -13,7 +13,7 @@ onMounted(() => {
     <main>
         <h1>MELHORES AVALIAÇÕES</h1>
         <ul>
-            <li v-for="filme in store.filmes">
+            <li v-for="filme in store.filmesMaisBemAvaliados">
                 <img :src="'https://image.tmdb.org/t/p/w200' + filme.poster_path" alt="Poster do filme">
                 <div class="lado">
                     <div class="informacao">

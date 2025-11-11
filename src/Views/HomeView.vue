@@ -3,7 +3,7 @@ import BannerComponent from '@/components/BannerComponent.vue';
 import CarrosselComponent from '@/components/CarrosselComponent.vue';
 import RotacaoTendenciasComponent from '@/components/RotacaoTendenciasComponent.vue';
 import AvaliationComponent from '@/components/AvaliationComponent.vue';
-import ActorsComponent from '@/components/ActorsComponent.vue';
+import ActoresFamososComponent from '@/components/ActoresFamososComponent.vue';
 </script>
 
 <template>
@@ -11,5 +11,5 @@ import ActorsComponent from '@/components/ActorsComponent.vue';
 <CarrosselComponent />
 <RotacaoTendenciasComponent />
 <AvaliationComponent />
-<ActorsComponent />
+<ActoresFamososComponent />
 </template>

@@ -4,10 +4,27 @@ import TMDBapi from '@/plugins/axios'
 
 export const useFilmesStore = defineStore('filmes', () => {
   const filmes = ref([])
+  const filmesMaisBemAvaliados = ref([])
   const movies = ref([])
   const genres = ref([])
   const totalPages = ref(1)
   const filtrosAtivos = ref([])
+
+
+  const getTopRatedFilmes = async () => {
+    try {
+      const response = await TMDBapi.get('/movie/top_rated', {
+        params: { language: 'pt-BR' },
+      })
+       const ordenados = response.data.results
+        .sort((a, b) => b.vote_average - a.vote_average)
+        .slice(0, 3)
+
+      filmesMaisBemAvaliados.value = ordenados
+    } catch (error) {
+      console.error('Erro ao buscar filmes mais bem avaliados:', error)
+    }
+  }
 
   const getGenres = async () => {
     try {
@@ -46,5 +63,7 @@ export const useFilmesStore = defineStore('filmes', () => {
     filtrosAtivos,
     getGenres,
     listMovies,
+    getTopRatedFilmes,
+    filmesMaisBemAvaliados,
   }
 })
