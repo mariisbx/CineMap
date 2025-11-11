@@ -7,7 +7,7 @@ import { RouterLink } from 'vue-router';
         <nav>
             <ul>
                 <li>
-                     <RouterLink to="/"> <img src="/images/Logo.png" alt="Logo"> </RouterLink>
+                     <RouterLink to="/" class="logo"> <img src="/images/Logo.png" alt="Logo"> </RouterLink>
                 </li>
                 <li>
                     <RouterLink to="/filmes">Filmes</RouterLink>
@@ -60,5 +60,17 @@ ul li img {
     font-size: 20px;
     margin-left: 60vw;
     color: #44001A;
+}
+ul li a.logo.router-link-exact-active {
+    border: none;
+    padding: 0;
+}
+ul li a.router-link-exact-active {
+    color: #D3B1B8;
+    font-weight: 700;
+    border: 3px solid #D3B1B8;
+    padding: 2px 5px;
+    border-radius: 5px;
+    transition: 0.3s;
 }
 </style>
