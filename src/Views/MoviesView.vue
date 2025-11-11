@@ -1,3 +1,7 @@
+<script setup>
+import FilmesComponent from '@/components/FilmesComponent.vue';
+</script>
+
 <template>
-    <h1>Filmes</h1>
+<FilmesComponent />
 </template>
