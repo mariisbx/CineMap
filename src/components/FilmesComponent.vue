@@ -1,6 +1,12 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useFilmesStore } from '@/stores/filmes'
+import { useRouter } from 'vue-router'
+const router = useRouter()
+
+const openMovie = (id) => {
+  router.push({ name: 'DetalhesFilmes', params: { movieId: id } })
+}
 
 const store = useFilmesStore()
 const mostrarFiltros = ref(false)
@@ -76,7 +82,7 @@ const generosFiltrados = computed(() =>
         <img :src="'https://image.tmdb.org/t/p/w500' + filme.poster_path" :alt="filme.title" />
         <h2>{{ filme.title }}</h2>
         <p>{{ filme.release_date }}</p>
-        <button>Ver mais</button>
+       <button @click="openMovie(filme.id)">Ver mais</button>
       </li>
     </ul>
 
@@ -207,7 +213,7 @@ const generosFiltrados = computed(() =>
 .lista-filmes {
   display: flex;
   flex-wrap: wrap;
-  gap: 60px;
+  gap: 40px;
   list-style: none;
   padding: 0;
   justify-content: center;

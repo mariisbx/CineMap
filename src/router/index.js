@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import DetalhesFilmes from '@/components/DetalhesFilmes.vue';
 
 const routes = [
     {
@@ -6,7 +7,7 @@ const routes = [
         name: 'Home',
         component: () => import('../Views/HomeView.vue'),
     },
-     {
+    {
         path: '/filmes',
         name: 'filmes',
         component: () => import('../Views/MoviesView.vue'),
@@ -21,11 +22,17 @@ const routes = [
         name: 'CineMap',
         component: () => import('../Views/CineMapView.vue'),
     },
+    {
+        path: '/filmes/:movieId',
+        name: 'DetalhesFilmes',
+        component: DetalhesFilmes,
+        props: true,
+    },
 ];
 
 const router = createRouter({
-  history: createWebHistory(),
-  routes,
+    history: createWebHistory(),
+    routes,
 });
 
 export default router;

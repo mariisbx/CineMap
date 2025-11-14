@@ -9,18 +9,19 @@ export const useFilmesStore = defineStore('filmes', () => {
   const genres = ref([])
   const totalPages = ref(1)
   const filtrosAtivos = ref([])
-
+  const trailerKey = ref(null)
+  const currentMovie = ref(null)
 
   const getTopRatedFilmes = async () => {
     try {
       const response = await TMDBapi.get('/movie/top_rated', {
         params: { language: 'pt-BR' },
       })
-       const ordenados = response.data.results
+
+      filmesMaisBemAvaliados.value = response.data.results
         .sort((a, b) => b.vote_average - a.vote_average)
         .slice(0, 3)
 
-      filmesMaisBemAvaliados.value = ordenados
     } catch (error) {
       console.error('Erro ao buscar filmes mais bem avaliados:', error)
     }
@@ -28,7 +29,9 @@ export const useFilmesStore = defineStore('filmes', () => {
 
   const getGenres = async () => {
     try {
-      const response = await TMDBapi.get('/genre/movie/list', { params: { language: 'pt-BR' } })
+      const response = await TMDBapi.get('/genre/movie/list', {
+        params: { language: 'pt-BR' }
+      })
       genres.value = response.data.genres.map(g => ({ ...g, selecionado: false }))
     } catch (error) {
       console.error('Erro ao buscar gêneros:', error)
@@ -50,8 +53,34 @@ export const useFilmesStore = defineStore('filmes', () => {
       const total = response.data.total_results || 0
       const pages = Math.ceil(total / 20)
       totalPages.value = pages > 15 ? 15 : pages
+
     } catch (error) {
       console.error('Erro ao listar filmes:', error)
+    }
+  }
+
+  const getMovieDetail = async (id) => {
+    try {
+      // detalhes do filme
+      const movieRes = await TMDBapi.get(`/movie/${id}`, {
+        params: { language: 'pt-BR' }
+      })
+
+      currentMovie.value = movieRes.data
+
+      // vídeos
+      const videoRes = await TMDBapi.get(`/movie/${id}/videos`, {
+        params: { language: 'pt-BR' }
+      })
+
+      const trailer = videoRes.data.results.find(
+        v => v.type === 'Trailer' && v.site === 'YouTube'
+      )
+
+      trailerKey.value = trailer ? trailer.key : null
+
+    } catch (err) {
+      console.error("Erro ao carregar detalhes do filme:", err)
     }
   }
 
@@ -65,5 +94,8 @@ export const useFilmesStore = defineStore('filmes', () => {
     listMovies,
     getTopRatedFilmes,
     filmesMaisBemAvaliados,
+    currentMovie,
+    trailerKey,
+    getMovieDetail,
   }
 })

@@ -67,8 +67,7 @@ ul li a.logo.router-link-exact-active {
 }
 ul li a.router-link-exact-active {
     color: #D3B1B8;
-    font-weight: 700;
-    border: 3px solid #D3B1B8;
+    font-weight: 700; 
     padding: 2px 5px;
     border-radius: 5px;
     transition: 0.3s;

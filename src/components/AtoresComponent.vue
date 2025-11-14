@@ -91,7 +91,7 @@ const mudarPagina = async (page) => {
 .lista-filmes {
   display: flex;
   flex-wrap: wrap;
-  gap: 60px;
+  gap: 40px;
   list-style: none;
   padding: 0;
   justify-content: center;
