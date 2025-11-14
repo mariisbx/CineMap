@@ -4,22 +4,22 @@ const routes = [
     {
         path: '/',
         name: 'Home',
-        component: () => import('../Views/HomeView.vue'),
+        component: () => import('../views/HomeView.vue'),
     },
-     {
+    {
         path: '/filmes',
         name: 'filmes',
-        component: () => import('../Views/MoviesView.vue'),
+        component: () => import('../views/MoviesView.vue'),
     },
     {
         path: '/atores',
         name: 'atores',
-        component: () => import('../Views/ActorsView.vue'),
+        component: () => import('../views/ActorsView.vue'),
     },
     {
         path: '/cinemap',
         name: 'CineMap',
-        component: () => import('../Views/CineMapView.vue'),
+        component: () => import('../views/CineMapView.vue'),
     },
 ];
 
