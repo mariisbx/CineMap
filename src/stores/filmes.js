@@ -11,6 +11,8 @@ export const useFilmesStore = defineStore('filmes', () => {
   const filtrosAtivos = ref([])
   const trailerKey = ref(null)
   const currentMovie = ref(null)
+  const classificaoIndicativa = ref('')
+  const elenco = ref([])
 
   const getTopRatedFilmes = async () => {
     try {
@@ -61,14 +63,12 @@ export const useFilmesStore = defineStore('filmes', () => {
 
   const getMovieDetail = async (id) => {
     try {
-      // detalhes do filme
       const movieRes = await TMDBapi.get(`/movie/${id}`, {
         params: { language: 'pt-BR' }
       })
 
       currentMovie.value = movieRes.data
 
-      // vídeos
       const videoRes = await TMDBapi.get(`/movie/${id}/videos`, {
         params: { language: 'pt-BR' }
       })
@@ -79,10 +79,30 @@ export const useFilmesStore = defineStore('filmes', () => {
 
       trailerKey.value = trailer ? trailer.key : null
 
+      const releasesRes = await TMDBapi.get(`/movie/${id}/release_dates`)
+      const brRelease = releasesRes.data.results.find(r => r.iso_3166_1 === 'BR')
+
+      if (brRelease && brRelease.release_dates.length > 0) {
+        classificaoIndicativa.value = brRelease.release_dates[0].certification || "Não informado"
+      } else {
+        classificaoIndicativa.value = "Não informado"
+      }
+
+     const creditos = await TMDBapi.get(`/movie/${id}/credits`, {
+    params: {language: 'pt-BR'}
+}
+)
+
+      elenco.value = creditos.data.cast.slice(0, 15)
+
+
+      
     } catch (err) {
       console.error("Erro ao carregar detalhes do filme:", err)
     }
   }
+
+
 
   return {
     filmes,
@@ -97,5 +117,7 @@ export const useFilmesStore = defineStore('filmes', () => {
     currentMovie,
     trailerKey,
     getMovieDetail,
+    classificaoIndicativa,
+    elenco,
   }
 })

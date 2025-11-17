@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import DetalhesFilmes from '@/components/DetalhesFilmes.vue';
+import DetalhesFilmesView from '@/Views/DetalhesFilmesView.vue';
 
 const routes = [
     {
@@ -25,7 +25,7 @@ const routes = [
     {
         path: '/filmes/:movieId',
         name: 'DetalhesFilmes',
-        component: DetalhesFilmes,
+        component: DetalhesFilmesView,
         props: true,
     },
 ];
