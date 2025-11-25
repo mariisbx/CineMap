@@ -1,104 +1,129 @@
 <script setup>
-import { LMap, LTileLayer, LMarker, LPopup } from "@vue-leaflet/vue-leaflet";
 import { ref, onMounted } from "vue";
-import axios from "axios";
+import { LMap, LTileLayer, LMarker, LPopup } from "@vue-leaflet/vue-leaflet";
+import * as L from "leaflet";
+import { TMDBapi } from "@/plugins/api";
 import { getCountryLatLng } from "@/utils/countryCoords";
-import * as L from 'leaflet'; 
 
 const zoom = ref(2);
 const center = ref([20, 0]);
-const url = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
-const attribution = "Mapa &copy; <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> colaboradores";
-
 const countriesList = ref([]);
+const filmesSelecionados = ref(null);
 
-function getCountryIcon(iso) {
-    let iconUrl;
+const traduzir = new Intl.DisplayNames(["pt"], { type: "region" });
 
-    switch (iso) {
-        case 'BR': iconUrl = '/icones/bandeira-br.png'; break;
-        case 'PT': iconUrl = '/icones/bandeira-pt.png'; break;
-        case 'US': iconUrl = '/icones/estrela-eua.png'; break;
-        default: iconUrl = '/icones/icone-padrao.png'; break;
-    }
-
-    return L.icon({
-        iconUrl: iconUrl,
-        iconSize: [36, 36], 
-        iconAnchor: [18, 36], 
-        popupAnchor: [0, -36] 
-    });
+function nomePais(code) {
+  return traduzir.of(code) || "País";
 }
 
-const countryNameTranslator = new Intl.DisplayNames(['pt'], { type: 'region' });
-
-function getTranslatedCountryName(isoCode) {
-    const translatedName = countryNameTranslator.of(isoCode);
-    
-    return translatedName || 'País Desconhecido';
+function getIcon() {
+  return L.icon({
+    iconUrl:
+      "https://raw.githubusercontent.com/oxfist/leaflet-color-markers/master/img/marker-icon-2x-violet.png",
+    shadowUrl:
+      "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+    iconSize: [28, 45],
+    iconAnchor: [14, 45]
+  });
 }
 
 onMounted(async () => {
-    const apiKey = "34d906537bd517d4c4e627bee6f0fbb0";
+  const { data } = await TMDBapi.get("movie/popular", { params: { page: 1 } });
 
-    const { data } = await axios.get(
-        `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=pt-BR&page=1`
-    );
+  const mapa = new Map();
 
-    const movies = data.results;
-    const mapCountries = new Map();
+  data.results.forEach((filme) => {
+    if (!filme.production_countries) return;
 
-    movies.forEach((movie) => {
-        if (!movie.production_countries) return;
+    filme.production_countries.forEach((pais) => {
+      const iso = pais.iso_3166_1;
+      const coords = getCountryLatLng(iso);
+      if (!coords) return;
 
-        movie.production_countries.forEach((country) => {
-            const iso = country.iso_3166_1;
-            const coords = getCountryLatLng(iso);
+      const nome = nomePais(iso);
 
-            if (!coords) return;
-          
-            const translatedName = getTranslatedCountryName(iso);
-
-            if (!mapCountries.has(iso)) {
-                mapCountries.set(iso, {
-                    iso: iso,
-                    countryName: translatedName, 
-                    filmes: [movie.title],     
-                    coords,
-                });
-            } else {
-                mapCountries.get(iso).filmes.push(movie.title);
-            }
+      if (!mapa.has(iso)) {
+        mapa.set(iso, {
+          iso,
+          nome,
+          coords,
+          filmes: []
         });
-    });
+      }
 
-    countriesList.value = Array.from(mapCountries.values());
+      mapa.get(iso).filmes.push(filme.title);
+    });
+  });
+
+  countriesList.value = Array.from(mapa.values());
 });
 </script>
 
 <template>
-  <div id="map-container">
-    <LMap
-      style="height: 500px; width: 100%;"
-      :zoom="zoom"
-      :center="center"
-    >
-      <LTileLayer :url="url" :attribution="attribution" />
-      <LMarker
-        v-for="(country, index) in countriesList"
-        :key="index"
-        :lat-lng="country.coords"
-        :icon="getCountryIcon(country.iso)"
-      >
-        <LPopup>
-          <strong>País de Produção: {{ country.countryName }}</strong><br />
-          <hr style="margin: 5px 0;">
-          <p>Filmes populares produzidos aqui:</p>
-          <span v-for="(film, i) in country.filmes" :key="i">
-            • {{ film }} <br />
-          </span>
-        </LPopup>
-      </LMarker>
-    </LMap>
+  <div class="container">
+    <div class="mapa">
+      <LMap :zoom="zoom" :center="center">
+        <LTileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution="© OpenStreetMap"
+        />
+
+        <LMarker
+          v-for="(pais, i) in countriesList"
+          :key="i"
+          :lat-lng="pais.coords"
+          :icon="getIcon()"
+          @click="filmesSelecionados = pais"
+        >
+          <LPopup>
+            <strong>{{ pais.nome }}</strong><br />
+            ISO: {{ pais.iso }}<br /><br />
+
+            <div v-if="pais.filmes.length">
+              <div v-for="(filme, j) in pais.filmes" :key="j">• {{ filme }}</div>
+            </div>
+
+            <div v-else>
+              Nenhum filme encontrado.
+            </div>
+          </LPopup>
+        </LMarker>
+      </LMap>
+    </div>
+
+    <div v-if="filmesSelecionados" class="lista-filmes">
+      <h3>{{ filmesSelecionados.nome }}</h3>
+
+      <ul v-if="filmesSelecionados.filmes.length">
+        <li v-for="(f, i) in filmesSelecionados.filmes" :key="i">{{ f }}</li>
+      </ul>
+
+      <p v-else>Nenhum filme encontrado.</p>
+    </div>
   </div>
 </template>
+
+<style scoped>
+.mapa {
+  height: 500px;
+  width: 100%;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.lista-filmes {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+</style>
+
+<style>
+.leaflet-container {
+  font-family: inherit;
+}
+</style>
