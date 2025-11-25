@@ -25,7 +25,7 @@ const mudarPagina = async (page) => {
     <ul class="lista-filmes">
       <li v-for="ator in store.atores" :key="ator.id">
         <img
-          :src="ator.imagem ? 'https://image.tmdb.org/t/p/w500' + ator.imagem : '/sem-foto.png'"
+          :src="ator.imagem ? 'https://image.tmdb.org/t/p/w500' + ator.imagem : '/images/AtorSemFoto.avif'"
           :alt="ator.nome"
         />
         <h2>{{ ator.nome }}</h2>

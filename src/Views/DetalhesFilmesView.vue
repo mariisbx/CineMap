@@ -12,11 +12,16 @@ const store = useFilmesStore()
 onMounted(async () => {
   await store.getMovieDetail(route.params.movieId)
 })
+
+function voltar() {
+  store.resetMovie()
+  window.history.back()
+}
 </script>
 
 <template>
   <main v-if="store.currentMovie">
-    <button @click="$router.back()">Voltar</button>
+    <button @click="voltar()">Voltar</button>
 
     <DetalhesFilmesBanner />
     <DetalhesFilmesElenco />

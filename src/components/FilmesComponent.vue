@@ -2,26 +2,30 @@
 import { ref, computed, onMounted } from 'vue'
 import { useFilmesStore } from '@/stores/filmes'
 import { useRouter } from 'vue-router'
+
 const router = useRouter()
+const store = useFilmesStore()
+
+const mostrarFiltros = ref(false)
+const buscaGenero = ref('')
 
 const openMovie = (id) => {
   router.push({ name: 'DetalhesFilmes', params: { movieId: id } })
 }
 
-const store = useFilmesStore()
-const mostrarFiltros = ref(false)
-const pageAtual = ref(1)
-const buscaGenero = ref('')
-
 onMounted(async () => {
-  await store.getGenres()
-  await store.listMovies(1, [])
+  if (!store.genres.length) {
+    await store.getGenres()
+  }
+
+  await store.listMovies(store.pageAtual, store.filtrosAtivos.value)
 })
 
 const mudarPagina = async (page) => {
   if (page < 1 || page > store.totalPages) return
-  pageAtual.value = page
+  store.pageAtual = page
   await store.listMovies(page, store.filtrosAtivos.value)
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 const aplicarFiltros = async () => {
@@ -30,8 +34,8 @@ const aplicarFiltros = async () => {
     .map(g => g.id)
 
   store.filtrosAtivos.value = idsSelecionados
-  pageAtual.value = 1
-  await store.listMovies(1, store.filtrosAtivos.value)
+  store.pageAtual = 1
+  await store.listMovies(store.pageAtual.value, store.filtrosAtivos.value)
   mostrarFiltros.value = false
 }
 
@@ -39,9 +43,10 @@ const limparFiltros = async () => {
   store.genres.forEach(g => (g.selecionado = false))
   store.filtrosAtivos.value = []
   buscaGenero.value = ''
-  pageAtual.value = 1
-  await store.listMovies(1, [])
+  store.pageAtual = 1
+  await store.listMovies(store.pageAtual.value, [])
 }
+
 
 const generosFiltrados = computed(() =>
   store.genres.filter(g => g.name.toLowerCase().includes(buscaGenero.value.toLowerCase()))
@@ -61,11 +66,7 @@ const generosFiltrados = computed(() =>
           <button class="botao-limpar" @click="limparFiltros">✕ Limpar</button>
         </div>
 
-        <input
-          v-model="buscaGenero"
-          class="campo-busca"
-          placeholder="Pesquisar gênero..."
-        />
+        <input v-model="buscaGenero" class="campo-busca" placeholder="Pesquisar gênero..." />
 
         <ul class="lista-filtros">
           <li v-for="g in generosFiltrados" :key="g.id">
@@ -79,26 +80,28 @@ const generosFiltrados = computed(() =>
 
     <ul class="lista-filmes">
       <li v-for="filme in store.movies" :key="filme.id">
-        <img :src="'https://image.tmdb.org/t/p/w500' + filme.poster_path" :alt="filme.title" />
+        <div v-if="!filme.poster_path" class="no-poster">
+          <span class="mdi mdi-movie"></span>
+          <P>Sem imagem disponível</P>
+        </div>
+
+        <img v-else :src="'https://image.tmdb.org/t/p/w500' + filme.poster_path" :alt="filme.title" />
         <h2>{{ filme.title }}</h2>
         <p>{{ filme.release_date }}</p>
-       <button @click="openMovie(filme.id)">Ver mais</button>
+        <button @click="openMovie(filme.id)">Ver mais</button>
       </li>
     </ul>
 
     <div v-if="store.movies.length" class="pagination">
-      <button @click="mudarPagina(pageAtual - 1)" :disabled="pageAtual === 1">←</button>
+      <button @click="mudarPagina(store.pageAtual - 1)" :disabled="store.pageAtual === 1">←</button>
 
-      <button
-        v-for="page in store.totalPages"
-        :key="page"
-        :class="{ active: pageAtual === page }"
-        @click="mudarPagina(page)"
-      >
+      <button v-for="page in store.totalPages" :key="page" :class="{ active: store.pageAtual === page }"
+        @click="mudarPagina(page)">
         {{ page }}
       </button>
 
-      <button @click="mudarPagina(pageAtual + 1)" :disabled="pageAtual === store.totalPages">→</button>
+      <button @click="mudarPagina(store.pageAtual.value + 1)"
+        :disabled="store.pageAtual === store.totalPages">→</button>
     </div>
   </main>
 </template>
@@ -115,18 +118,15 @@ const generosFiltrados = computed(() =>
   border: none;
   font-weight: 600;
   cursor: pointer;
- font-weight: 600;
+  font-weight: 600;
   font-size: 1.34rem;
-   --bg-size: 400%;
+  --bg-size: 400%;
   --color-one: #44001a;
   --color-two: #aa0041;
-  background: linear-gradient(
-      90deg,
+  background: linear-gradient(90deg,
       var(--color-one),
       var(--color-two),
-      var(--color-one)
-    )
-    0 0 / var(--bg-size) 100%;
+      var(--color-one)) 0 0 / var(--bg-size) 100%;
   color: transparent;
   -webkit-background-clip: text;
   background-clip: text;
@@ -134,8 +134,13 @@ const generosFiltrados = computed(() =>
 }
 
 @keyframes move-bg {
-  0% { background-position: 0 0; }
-  100% { background-position: var(--bg-size) 0; }
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: var(--bg-size) 0;
+  }
 }
 
 .caixa-filtros {
@@ -143,7 +148,7 @@ const generosFiltrados = computed(() =>
   top: 35px;
   left: 0;
   background: #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   padding: 15px 20px;
   width: 230px;
@@ -241,14 +246,16 @@ p {
   color: #D3B1B8;
   margin-bottom: 10px;
 }
+
 .lista-filmes button {
-    padding: 6px 0;
+  padding: 6px 0;
   border: none;
   border-radius: 6px;
   background-color: #44001A;
   color: white;
   cursor: pointer;
 }
+
 .lista-filmes button:hover {
   background-color: #2e0012;
   transition: 1s;
@@ -288,5 +295,24 @@ p {
 .pagination button:disabled {
   opacity: 0.4;
   cursor: default;
+}
+.no-poster{
+  background-color: #2e00125e;
+  width: 100%;
+  height: 83%;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+.no-poster p{
+  color: white;
+  margin-bottom: 5px;
+
+}
+.no-poster .mdi{
+  color: white;
+  font-size: 2rem;
 }
 </style>

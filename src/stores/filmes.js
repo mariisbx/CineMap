@@ -13,6 +13,8 @@ export const useFilmesStore = defineStore('filmes', () => {
   const currentMovie = ref(null)
   const classificaoIndicativa = ref('')
   const elenco = ref([])
+  const pageAtual = ref(1)
+
 
   const getTopRatedFilmes = async () => {
     try {
@@ -102,7 +104,12 @@ export const useFilmesStore = defineStore('filmes', () => {
     }
   }
 
-
+  const resetMovie = () => {
+  currentMovie.value = null
+  trailerKey.value = null
+  classificaoIndicativa.value = ''
+  elenco.value = []
+}
 
   return {
     filmes,
@@ -119,5 +126,7 @@ export const useFilmesStore = defineStore('filmes', () => {
     getMovieDetail,
     classificaoIndicativa,
     elenco,
+    resetMovie,
+    pageAtual
   }
 })
