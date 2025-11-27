@@ -3,7 +3,8 @@ import { ref, onMounted } from "vue";
 import { LMap, LTileLayer, LMarker, LPopup } from "@vue-leaflet/vue-leaflet";
 import * as L from "leaflet";
 import { TMDBapi } from "@/plugins/api";
-import { getCountryLatLng } from "@/utils/countryCoords";
+import { countryCoords, getCountryLatLng } from "@/utils/countryCoords";
+import markerIcon from "@/assets/icons/marker-44001A.svg";
 
 const zoom = ref(2);
 const center = ref([20, 0]);
@@ -13,49 +14,50 @@ const filmesSelecionados = ref(null);
 const traduzir = new Intl.DisplayNames(["pt"], { type: "region" });
 
 function nomePais(code) {
-  return traduzir.of(code) || "País";
+  return traduzir.of(code) || code;
 }
 
 function getIcon() {
   return L.icon({
-    iconUrl:
-      "https://raw.githubusercontent.com/oxfist/leaflet-color-markers/master/img/marker-icon-2x-violet.png",
-    shadowUrl:
-      "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-    iconSize: [28, 45],
-    iconAnchor: [14, 45]
+    iconUrl: markerIcon,
+    iconSize: [22, 34],
+    iconAnchor: [11, 34],
+    popupAnchor: [0, -32]
   });
 }
 
-onMounted(async () => {
-  const { data } = await TMDBapi.get("movie/popular", { params: { page: 1 } });
-
-  const mapa = new Map();
-
-  data.results.forEach((filme) => {
-    if (!filme.production_countries) return;
-
-    filme.production_countries.forEach((pais) => {
-      const iso = pais.iso_3166_1;
-      const coords = getCountryLatLng(iso);
-      if (!coords) return;
-
-      const nome = nomePais(iso);
-
-      if (!mapa.has(iso)) {
-        mapa.set(iso, {
-          iso,
-          nome,
-          coords,
-          filmes: []
-        });
+async function buscarFilmesDoPais(code) {
+  try {
+    const { data } = await TMDBapi.get("discover/movie", {
+      params: {
+        with_origin_country: code,
+        page: 1
       }
-
-      mapa.get(iso).filmes.push(filme.title);
     });
-  });
+    return data.results.map(f => f.title);
+  } catch {
+    return [];
+  }
+}
 
-  countriesList.value = Array.from(mapa.values());
+onMounted(async () => {
+  const lista = [];
+
+  for (const iso in countryCoords) {
+    const coords = getCountryLatLng(iso);
+    if (!coords) continue;
+
+    const filmes = await buscarFilmesDoPais(iso);
+
+    lista.push({
+      iso,
+      nome: nomePais(iso),
+      coords,
+      filmes
+    });
+  }
+
+  countriesList.value = lista;
 });
 </script>
 
@@ -80,7 +82,9 @@ onMounted(async () => {
             ISO: {{ pais.iso }}<br /><br />
 
             <div v-if="pais.filmes.length">
-              <div v-for="(filme, j) in pais.filmes" :key="j">• {{ filme }}</div>
+              <div v-for="(filme, j) in pais.filmes" :key="j">
+                • {{ filme }}
+              </div>
             </div>
 
             <div v-else>
@@ -95,7 +99,9 @@ onMounted(async () => {
       <h3>{{ filmesSelecionados.nome }}</h3>
 
       <ul v-if="filmesSelecionados.filmes.length">
-        <li v-for="(f, i) in filmesSelecionados.filmes" :key="i">{{ f }}</li>
+        <li v-for="(f, i) in filmesSelecionados.filmes" :key="i">
+          {{ f }}
+        </li>
       </ul>
 
       <p v-else>Nenhum filme encontrado.</p>
@@ -105,16 +111,15 @@ onMounted(async () => {
 
 <style scoped>
 .mapa {
-  height: 500px;
+  height: 720px;
   width: 100%;
+  margin: 0 auto;
 }
-
 .container {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
-
 .lista-filmes {
   padding: 12px;
   border: 1px solid #ccc;

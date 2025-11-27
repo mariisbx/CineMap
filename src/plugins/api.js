@@ -14,7 +14,7 @@ export const MapAPI = axios.create({
   baseURL: "https://nominatim.openstreetmap.org/",
   headers: {
     "Accept-Language": "pt-BR",
-    "User-Agent": "SeuApp/1.0"
+    "User-Agent": "CineMap/1.0"
   },
   params: {
     format: "json"
@@ -22,13 +22,13 @@ export const MapAPI = axios.create({
 });
 
 TMDBapi.interceptors.response.use(
-  (response) => response,
-  (error) => Promise.reject(error)
+  r => r,
+  e => Promise.reject(e)
 );
 
 MapAPI.interceptors.response.use(
-  (response) => response,
-  (error) => Promise.reject(error)
+  r => r,
+  e => Promise.reject(e)
 );
 
 export default {

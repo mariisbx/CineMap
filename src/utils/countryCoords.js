@@ -251,5 +251,7 @@ export const countryCoords = {
 };
 
 export function getCountryLatLng(code) {
-  return countryCoords[code] || null;
+  if (!code) return null;
+  return countryCoords[code.toUpperCase()] || null;
 }
+
