@@ -1,6 +1,6 @@
 <script setup>
 import { useFilmesStore } from '@/stores/filmes'
-import { onMounted } from 'vue'
+import { onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import DetalhesFilmesBanner from '@/components/DetalhesFilmesBanner.vue'
@@ -11,9 +11,19 @@ import RecomendacaoCOmponent from '@/components/RecomendacaoCOmponent.vue'
 const route = useRoute()
 const store = useFilmesStore()
 
-onMounted(async () => {
-  await store.getMovieDetail(route.params.movieId)
+
+onMounted(() => {
+  store.getMovieDetail(route.params.movieId)
 })
+
+
+watch(
+  () => route.params.movieId,
+  (newId) => {
+    store.getMovieDetail(newId)
+  }
+)
+
 
 function voltar() {
   store.resetMovie()

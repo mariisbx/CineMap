@@ -35,16 +35,17 @@ img{
 }
 
 .posters::-webkit-scrollbar-track {
-  background: #1a1a1a;
+  background: white;
   border-radius: 10px;
 }
 
 .posters::-webkit-scrollbar-thumb {
-  background: linear-gradient(to right, #c99ba6, #4a2f36);
+  background: linear-gradient(to right, #c99ba6a6, #ddb8c367);
   border-radius: 10px;
+  width: 600px;
 }
 
 .posters::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(to right, #ddb8c3, #4a2f36);
+  background: linear-gradient(to right, #c99ba6a6, #ddb8c367);
 }
 </style>
