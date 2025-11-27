@@ -14,7 +14,9 @@ export const useFilmesStore = defineStore('filmes', () => {
   const classificaoIndicativa = ref('')
   const elenco = ref([])
   const pageAtual = ref(1)
-
+  const redesSociais = ref({})
+  const posters = ref([])
+  const recommendations = ref([]) 
 
   const getTopRatedFilmes = async () => {
     try {
@@ -90,14 +92,27 @@ export const useFilmesStore = defineStore('filmes', () => {
         classificaoIndicativa.value = "Não informado"
       }
 
-     const creditos = await TMDBapi.get(`/movie/${id}/credits`, {
-    params: {language: 'pt-BR'}
-}
-)
+      const creditos = await TMDBapi.get(`/movie/${id}/credits`, {
+        params: { language: 'pt-BR' }
+      }
+      )
 
       elenco.value = creditos.data.cast.slice(0, 15)
 
+      const externalRes = await TMDBapi.get(`/movie/${id}/external_ids`)
+      redesSociais.value = {
+        instagram: externalRes.data.instagram_id,
+        twitter: externalRes.data.twitter_id,
+        facebook: externalRes.data.facebook_id
+      }
 
+      const imagesRes = await TMDBapi.get(`/movie/${id}/images`, {
+        params: { include_image_language: 'en,null,pt' }
+      })
+
+      posters.value = imagesRes.data.posters || []
+
+      getMovieRecommendations(id)
       
     } catch (err) {
       console.error("Erro ao carregar detalhes do filme:", err)
@@ -105,11 +120,24 @@ export const useFilmesStore = defineStore('filmes', () => {
   }
 
   const resetMovie = () => {
-  currentMovie.value = null
-  trailerKey.value = null
-  classificaoIndicativa.value = ''
-  elenco.value = []
-}
+    currentMovie.value = null
+    trailerKey.value = null
+    classificaoIndicativa.value = ''
+    elenco.value = []
+  }
+
+  const getMovieRecommendations = async (id) => {
+  try {
+    const response = await TMDBapi.get(`/movie/${id}/recommendations`, {
+      params: { language: 'pt-BR', page: 1 }
+    });
+
+    recommendations.value = response.data.results || [];
+
+  } catch (err) {
+    console.error("Erro ao buscar recomendações:", err);
+  }
+};
 
   return {
     filmes,
@@ -127,6 +155,10 @@ export const useFilmesStore = defineStore('filmes', () => {
     classificaoIndicativa,
     elenco,
     resetMovie,
-    pageAtual
+    pageAtual,
+    redesSociais,
+    posters,
+    recommendations,
+    getMovieRecommendations,
   }
 })

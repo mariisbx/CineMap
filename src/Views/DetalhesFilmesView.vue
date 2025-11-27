@@ -5,6 +5,8 @@ import { useRoute } from 'vue-router'
 
 import DetalhesFilmesBanner from '@/components/DetalhesFilmesBanner.vue'
 import DetalhesFilmesElenco from '@/components/DetalhesFilmesElenco.vue'
+import PostersComponent from '@/components/PostersComponent.vue'
+import RecomendacaoCOmponent from '@/components/RecomendacaoCOmponent.vue'
 
 const route = useRoute()
 const store = useFilmesStore()
@@ -25,5 +27,7 @@ function voltar() {
 
     <DetalhesFilmesBanner />
     <DetalhesFilmesElenco />
+    <PostersComponent />
+    <RecomendacaoCOmponent/>
   </main>
 </template>

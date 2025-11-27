@@ -82,7 +82,7 @@ const generosFiltrados = computed(() =>
       <li v-for="filme in store.movies" :key="filme.id">
         <div v-if="!filme.poster_path" class="no-poster">
           <span class="mdi mdi-movie"></span>
-          <P>Sem imagem disponível</P>
+          <p>Sem imagem disponível</p>
         </div>
 
         <img v-else :src="'https://image.tmdb.org/t/p/w500' + filme.poster_path" :alt="filme.title" />

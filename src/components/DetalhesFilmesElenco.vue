@@ -9,7 +9,8 @@ const store = useFilmesStore()
 
     <ul>
       <li v-for="ator in store.elenco" :key="ator.id">
-        <img :src="ator.profile_path ? 'https://image.tmdb.org/t/p/w500' + ator.profile_path : '/sem-foto.png'">
+        <img
+          :src="ator.profile_path ? 'https://image.tmdb.org/t/p/w500' + ator.profile_path : '/images/AtorSemFoto.avif'">
         <p class="ator">{{ ator.name }}</p>
         <p class="personagem">{{ ator.character }}</p>
       </li>
@@ -17,29 +18,41 @@ const store = useFilmesStore()
   </section>
 
   <section class="info">
-    <h2>Titulo original</h2>
-    <p>{{ store.currentMovie.original_title }}</p>
+    <h2 class="titulo">Titulo original</h2>
+    <p class="otomano">{{ store.currentMovie.original_title }}</p>
 
-    <h2>Redes socias</h2>
-    <span class="mdi mdi-twitter"></span>
-    <span class="mdi mdi-instagram"></span>
+    <h2 v-if="store.redesSociais.twitter || store.redesSociais.instagram" class="titulo">Redes socias</h2>
+    <div class="icones">
+
+    <a v-if="store.redesSociais.twitter" :href="'https://twitter.com/' + store.redesSociais.twitter" target="_blank">
+      <span class="mdi mdi-twitter"></span>
+    </a>
+
+    <a v-if="store.redesSociais.instagram" :href="'https://instagram.com/' + store.redesSociais.instagram"
+      target="_blank">
+      <span class="mdi mdi-instagram"></span>
+    </a>
+
+    <a v-if="store.redesSociais.facebook" :href="'https://facebook.com/' + store.redesSociais.facebook"
+      target="_blank">
+
+      <span class="mdi mdi-facebook"></span>
+  </a>
+      </div>
   </section>
 </template>
 
 <style scoped>
-h1{
-   font-size: 2rem;
+h1 {
+  font-size: 2rem;
   font-weight: 700;
   --bg-size: 400%;
   --color-one: #44001a;
   --color-two: #aa0041;
-  background: linear-gradient(
-      90deg,
+  background: linear-gradient(90deg,
       var(--color-one),
       var(--color-two),
-      var(--color-one)
-    )
-    0 0 / var(--bg-size) 100%;
+      var(--color-one)) 0 0 / var(--bg-size) 100%;
   color: transparent;
   -webkit-background-clip: text;
   background-clip: text;
@@ -50,18 +63,23 @@ h1{
 }
 
 @keyframes move-bg {
-  0% { background-position: 0 0; }
-  100% { background-position: var(--bg-size) 0; }
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: var(--bg-size) 0;
+  }
 }
 
 ul {
   display: flex;
   justify-content: flex-start;
-  overflow-x: auto;     
-  overflow-y: hidden;   
+  overflow-x: auto;
+  overflow-y: hidden;
   gap: 30px;
   margin: 1vw 6.5vw;
-  padding-bottom: 10px; 
+  padding-bottom: 10px;
 }
 
 ul::-webkit-scrollbar {
@@ -79,34 +97,73 @@ ul::-webkit-scrollbar-thumb {
 }
 
 ul::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(to right, #ddb8c3, #4a2f36 );
+  background: linear-gradient(to right, #ddb8c3, #4a2f36);
 }
 
 ul li img {
   width: 250px;
   border-radius: 10px;
 }
+
 li {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   border-radius: 10px;
   margin-bottom: 1vw;
 }
-.ator{
-    font-size: 1.2rem;
-    padding-top: 10px;
-    margin-bottom: 5px;
-    margin-left: 8px;
+
+.ator {
+  font-size: 1.2rem;
+  padding-top: 10px;
+  margin-bottom: 5px;
+  margin-left: 8px;
 }
-.personagem{
-    color: #c99ba698;
-    font-size: 1.1rem;
-    padding-bottom: 20px;
-    margin-left: 8px;
+
+.personagem {
+  color: #c99ba698;
+  font-size: 1.1rem;
+  padding-bottom: 20px;
+  margin-left: 8px;
 }
-li:hover{
-    transform: scale(1.05);
-    transition: 1s;
-    border-radius: 10px;
-    cursor: pointer;
+
+li:hover {
+  transform: scale(1.05);
+  transition: 1s;
+  border-radius: 10px;
+  cursor: pointer;
 }
+
+.titulo{
+  font-size: 1.3rem;
+  font-weight: 700;
+  --bg-size: 400%;
+  --color-one: #44001a;
+  --color-two: #aa0041;
+  background: linear-gradient(90deg,
+      var(--color-one),
+      var(--color-two),
+      var(--color-one)) 0 0 / var(--bg-size) 100%;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: move-bg 8s infinite linear;
+  margin-bottom: 0.6vw;
+  margin-left: 6.5vw;
+  margin-top: 2vw;
+}
+
+.otomano{
+  margin-left: 6.5vw;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.icones{
+  font-size: 2rem;
+  margin-left: 6.5vw;
+  display: flex;
+}
+.mdi{
+  margin-right: 10px;
+  color: #1a1a1a;
+  }
 </style>
