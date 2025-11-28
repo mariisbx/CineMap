@@ -35,7 +35,8 @@ const mudarPagina = async (page) => {
         </p>
         <p v-else>Sem filmes conhecidos</p>
 
-        <button>Ver mais</button>
+       <button @click="$router.push(`/atores/${ator.id}`)">Ver mais</button>
+
       </li>
     </ul>
 

@@ -50,12 +50,39 @@ export const useActorsStore = defineStore('atores', () => {
         }
     }
 
+    const atorDetalhes = ref(null);
+
+const getAtorDetalhes = async (id) => {
+    try {
+        const response = await TMDBapi.get(`/person/${id}`, {
+            params: { language: 'pt-BR' }
+        });
+
+        const filmesResponse = await TMDBapi.get(`/person/${id}/movie_credits`, {
+            params: { language: 'pt-BR' }
+        });
+
+        atorDetalhes.value = {
+            id: response.data.id,
+            nome: response.data.name,
+            biografia: response.data.biography,
+            imagem: response.data.profile_path,
+            nascimento: response.data.birthday,
+            filmes: filmesResponse.data.cast.slice(0, 20)
+        };
+    } catch (error) {
+        console.error("Erro ao carregar detalhes do ator:", error);
+    }
+};
+
     return {
         popularesAtores,
         getPopularAtores,
         atores, 
         totalPages,
         listAtores,
+        atorDetalhes,
+        getAtorDetalhes,
     };
 
 

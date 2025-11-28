@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import DetalhesFilmesView from '@/Views/DetalhesFilmesView.vue';
+import DetalhesAtoresView from '@/Views/DetalhesAtoresView.vue';
 
 const routes = [
     {
@@ -28,6 +29,12 @@ const routes = [
         component: DetalhesFilmesView,
         props: true,
     },
+   {
+    path: '/atores/:atorId',
+    name: 'DetalhesAtor',
+    component: DetalhesAtoresView,
+    props: true,
+}
 ];
 
 const router = createRouter({
