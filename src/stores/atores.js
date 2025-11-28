@@ -55,19 +55,42 @@ export const useActorsStore = defineStore('atores', () => {
 const getAtorDetalhes = async (id) => {
     try {
         const response = await TMDBapi.get(`/person/${id}`, {
-            params: { language: 'pt-BR' }
+            params: { 
+                language: 'pt-BR',
+                append_to_response: 'external_ids'
+            }
         });
 
         const filmesResponse = await TMDBapi.get(`/person/${id}/movie_credits`, {
             params: { language: 'pt-BR' }
         });
 
+        const dados = response.data;
+
         atorDetalhes.value = {
-            id: response.data.id,
-            nome: response.data.name,
-            biografia: response.data.biography,
-            imagem: response.data.profile_path,
-            nascimento: response.data.birthday,
+            id: dados.id,
+            nome: dados.name,
+            biografia: dados.biography,
+            imagem: dados.profile_path,
+            nascimento: dados.birthday,
+            genero:
+                dados.gender === 1 ? "Feminino" :
+                dados.gender === 2 ? "Masculino" :
+                "Não informado",
+
+
+            redes: {
+                instagram: dados.external_ids.instagram_id
+                    ? `https://instagram.com/${dados.external_ids.instagram_id}`
+                    : null,
+                facebook: dados.external_ids.facebook_id
+                    ? `https://facebook.com/${dados.external_ids.facebook_id}`
+                    : null,
+                twitter: dados.external_ids.twitter_id
+                    ? `https://twitter.com/${dados.external_ids.twitter_id}`
+                    : null
+            },
+
             filmes: filmesResponse.data.cast.slice(0, 20)
         };
     } catch (error) {
@@ -75,15 +98,14 @@ const getAtorDetalhes = async (id) => {
     }
 };
 
-    return {
-        popularesAtores,
-        getPopularAtores,
-        atores, 
-        totalPages,
-        listAtores,
-        atorDetalhes,
-        getAtorDetalhes,
-    };
-
+return{
+    popularesAtores,
+    atores,
+    totalPages,
+    getPopularAtores,
+    listAtores,
+    getAtorDetalhes,
+    atorDetalhes,
+}
 
 });

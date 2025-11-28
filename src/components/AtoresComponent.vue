@@ -25,13 +25,13 @@ const mudarPagina = async (page) => {
     <ul class="lista-filmes">
       <li v-for="ator in store.atores" :key="ator.id">
         <img
-          :src="ator.imagem ? 'https://image.tmdb.org/t/p/w500' + ator.imagem : '/images/AtorSemFoto.avif'"
+          :src="ator.imagem ?   'https://image.tmdb.org/t/p/w500' + ator.imagem : '/images/AtorSemFoto.avif'"
           :alt="ator.nome"
         />
         <h2>{{ ator.nome }}</h2>
 
         <p v-if="ator.filmes && ator.filmes.length">
-          {{ ator.filmes.slice(0, 2).join(', ') }}
+          {{ ator.filmes.slice(0, 20).join(', ') }}
         </p>
         <p v-else>Sem filmes conhecidos</p>
 
