@@ -120,10 +120,7 @@ export const useFilmesStore = defineStore('filmes', () => {
   }
 
   const resetMovie = () => {
-    currentMovie.value = null
     trailerKey.value = null
-    classificaoIndicativa.value = ''
-    elenco.value = []
   }
 
   const getMovieRecommendations = async (id) => {

@@ -21,6 +21,12 @@ const openMovie = (id) => {
         <img v-if="movie.backdrop_path" :src="'https://image.tmdb.org/t/p/w500' + movie.backdrop_path"
           :alt="movie.title" />
 
+        <div v-else class="sem-foto">
+          <span class="mdi mdi-movie"></span>
+          <p>Sem imagem disponível</p>
+        </div>
+
+
         <div class="informacao">
           <p>{{ movie.title }}</p>
           <button @click="openMovie(movie.id)">Ver mais</button>
@@ -46,11 +52,13 @@ const openMovie = (id) => {
   margin-bottom: 2vw;
 
 }
-.informacao{
+
+.informacao {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+
 h2 {
   font-size: 1.5rem;
   font-weight: 700;
@@ -113,7 +121,6 @@ p {
 
 .receomendacao button {
   width: 30%;
-  height: 20hh;
   justify-content: left;
   padding: 0.4rem 0;
   margin-top: 0.5rem;
@@ -131,18 +138,39 @@ p {
   background: #20000c;
   transition: 2s;
 }
-.sem-formatacao{
-    margin-left: 6.5vw;
-    display: flex;
-    align-items: center;
-    margin-bottom: 2vw;
+
+.sem-formatacao {
+  margin-left: 6.5vw;
+  display: flex;
+  align-items: center;
+  margin-bottom: 2vw;
 }
-.sem-formatacao .mdi{
+
+.sem-formatacao .mdi {
   font-size: 1.7rem;
   margin-top: 1.5px;
   margin-right: 10px;
 }
-.sem-formatacao p{
+
+.sem-formatacao p {
   margin-top: 1vw;
+}
+.sem-foto{
+  background-color: #44001a54;
+  width: 350px;
+  height: 20.5vh;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  align-items: center;
+  color: #20000c;
+}
+.mdi{
+  font-size: 1.5rem;
+}
+.sem-foto p{
+  font-family: 0.8rem;
 }
 </style>
