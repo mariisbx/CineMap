@@ -28,6 +28,7 @@ watch(
 function voltar() {
   store.resetMovie()
   window.history.back()
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 </script>
 

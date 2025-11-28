@@ -11,6 +11,7 @@ const buscaGenero = ref('')
 
 const openMovie = (id) => {
   router.push({ name: 'DetalhesFilmes', params: { movieId: id } })
+    window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 onMounted(async () => {
@@ -18,34 +19,37 @@ onMounted(async () => {
     await store.getGenres()
   }
 
-  await store.listMovies(store.pageAtual, store.filtrosAtivos.value)
+  await store.listMovies(store.pageAtual, store.filtrosAtivos)
 })
 
 const mudarPagina = async (page) => {
   if (page < 1 || page > store.totalPages) return
   store.pageAtual = page
-  await store.listMovies(page, store.filtrosAtivos.value)
+  await store.listMovies(page, store.filtrosAtivos)
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
+
 
 const aplicarFiltros = async () => {
   const idsSelecionados = store.genres
     .filter(g => g.selecionado)
     .map(g => g.id)
 
-  store.filtrosAtivos.value = idsSelecionados
+  store.filtrosAtivos = idsSelecionados
   store.pageAtual = 1
-  await store.listMovies(store.pageAtual.value, store.filtrosAtivos.value)
+  await store.listMovies(store.pageAtual, store.filtrosAtivos)
   mostrarFiltros.value = false
 }
 
+
 const limparFiltros = async () => {
   store.genres.forEach(g => (g.selecionado = false))
-  store.filtrosAtivos.value = []
+  store.filtrosAtivos = []
   buscaGenero.value = ''
   store.pageAtual = 1
-  await store.listMovies(store.pageAtual.value, [])
+  await store.listMovies(store.pageAtual, [])
 }
+
 
 
 const generosFiltrados = computed(() =>
@@ -100,7 +104,7 @@ const generosFiltrados = computed(() =>
         {{ page }}
       </button>
 
-      <button @click="mudarPagina(store.pageAtual.value + 1)"
+      <button @click="mudarPagina(store.pageAtual + 1)"
         :disabled="store.pageAtual === store.totalPages">→</button>
     </div>
   </main>
