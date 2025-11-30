@@ -17,6 +17,7 @@ export const useFilmesStore = defineStore('filmes', () => {
   const redesSociais = ref({})
   const posters = ref([])
   const recommendations = ref([]) 
+  const buscaFilme = ref('')
 
   const getTopRatedFilmes = async () => {
     try {
@@ -44,26 +45,36 @@ export const useFilmesStore = defineStore('filmes', () => {
     }
   }
 
-  const listMovies = async (page = 1, genreIds = []) => {
-    try {
-      const response = await TMDBapi.get('/discover/movie', {
-        params: {
-          language: 'pt-BR',
-          page,
-          with_genres: genreIds.length ? genreIds.join(',') : undefined,
-        },
-      })
+ const listMovies = async (page = 1, genreIds = [], query = '') => {
+  try {
 
-      movies.value = response.data.results || []
-
-      const total = response.data.total_results || 0
-      const pages = Math.ceil(total / 20)
-      totalPages.value = pages > 15 ? 15 : pages
-
-    } catch (error) {
-      console.error('Erro ao listar filmes:', error)
+    if (query && query.trim() !== '') {
+      filtrosAtivos.value = []
+      genres.value.forEach(g => (g.selecionado = false))
     }
+
+    const endpoint = query ? '/search/movie' : '/discover/movie'
+
+    const response = await TMDBapi.get(endpoint, {
+      params: {
+        language: 'pt-BR',
+        page,
+        with_genres: query ? undefined : (genreIds.length ? genreIds.join(',') : undefined),
+        query: query || undefined
+      },
+    })
+
+    movies.value = response.data.results || []
+
+    const total = response.data.total_results || 0
+    const pages = Math.ceil(total / 20)
+    totalPages.value = pages > 15 ? 15 : pages
+
+  } catch (error) {
+    console.error('Erro ao listar filmes:', error)
   }
+}
+
 
   const getMovieDetail = async (id) => {
     try {
@@ -94,8 +105,7 @@ export const useFilmesStore = defineStore('filmes', () => {
 
       const creditos = await TMDBapi.get(`/movie/${id}/credits`, {
         params: { language: 'pt-BR' }
-      }
-      )
+      })
 
       elenco.value = creditos.data.cast.slice(0, 15)
 
@@ -124,17 +134,17 @@ export const useFilmesStore = defineStore('filmes', () => {
   }
 
   const getMovieRecommendations = async (id) => {
-  try {
-    const response = await TMDBapi.get(`/movie/${id}/recommendations`, {
-      params: { language: 'pt-BR', page: 1 }
-    });
+    try {
+      const response = await TMDBapi.get(`/movie/${id}/recommendations`, {
+        params: { language: 'pt-BR', page: 1 }
+      })
 
-    recommendations.value = response.data.results || [];
+      recommendations.value = response.data.results || []
 
-  } catch (err) {
-    console.error("Erro ao buscar recomendações:", err);
+    } catch (err) {
+      console.error("Erro ao buscar recomendações:", err)
+    }
   }
-};
 
   return {
     filmes,
@@ -157,5 +167,6 @@ export const useFilmesStore = defineStore('filmes', () => {
     posters,
     recommendations,
     getMovieRecommendations,
+    buscaFilme
   }
 })

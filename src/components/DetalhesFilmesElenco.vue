@@ -1,6 +1,25 @@
 <script setup>
 import { useFilmesStore } from '@/stores/filmes'
+import { useRouter, useRoute } from 'vue-router'
+
 const store = useFilmesStore()
+const router = useRouter()
+const route = useRoute()
+
+//const irParaAtor = (id) => {
+ // router.push({
+ //   path: `/atores/${id}`,
+  // query: {
+  //    from: 'filme',
+  //    movieId: route.params.movieId 
+  //  }
+  //})
+
+ // window.scrollTo({
+//  top: 0,
+  //  behavior: 'smooth'
+  //})
+//}
 </script>
 
 <template>
@@ -8,7 +27,7 @@ const store = useFilmesStore()
     <h1>Elenco principal</h1>
 
     <ul>
-      <li v-for="ator in store.elenco" :key="ator.id">
+      <li v-for="ator in store.elenco" :key="ator.id" @click="irParaAtor(ator.id)">
         <img
           :src="ator.profile_path ? 'https://image.tmdb.org/t/p/w500' + ator.profile_path : '/images/AtorSemFoto.avif'">
         <p class="ator">{{ ator.name }}</p>
@@ -129,7 +148,6 @@ li:hover {
   transform: scale(1.05);
   transition: 1s;
   border-radius: 10px;
-  cursor: pointer;
 }
 
 .titulo{

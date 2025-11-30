@@ -1,17 +1,24 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useFilmesStore } from '@/stores/filmes'
 import { useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
 
 const router = useRouter()
 const store = useFilmesStore()
+const { buscaFilme } = storeToRefs(store)
 
 const mostrarFiltros = ref(false)
 const buscaGenero = ref('')
 
+let searchTimer = null
+
 const openMovie = (id) => {
-  router.push({ name: 'DetalhesFilmes', params: { movieId: id } })
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+  router.push({
+    name: 'DetalhesFilmes',
+    params: { movieId: id },
+    query: { page: store.pageAtual }
+  })
 }
 
 onMounted(async () => {
@@ -19,16 +26,21 @@ onMounted(async () => {
     await store.getGenres()
   }
 
-  await store.listMovies(store.pageAtual, store.filtrosAtivos)
+  const initialPage = Number(router.currentRoute.value.query.page) || store.pageAtual
+  store.pageAtual = initialPage
+
+  await store.listMovies(store.pageAtual, store.filtrosAtivos, buscaFilme.value)
+})
+
+onBeforeUnmount(() => {
+  clearTimeout(searchTimer)
 })
 
 const mudarPagina = async (page) => {
   if (page < 1 || page > store.totalPages) return
   store.pageAtual = page
-  await store.listMovies(page, store.filtrosAtivos)
-  window.scrollTo({ top: 0, behavior: 'smooth' })
+  await store.listMovies(page, store.filtrosAtivos, buscaFilme.value)
 }
-
 
 const aplicarFiltros = async () => {
   const idsSelecionados = store.genres
@@ -37,20 +49,31 @@ const aplicarFiltros = async () => {
 
   store.filtrosAtivos = idsSelecionados
   store.pageAtual = 1
-  await store.listMovies(store.pageAtual, store.filtrosAtivos)
+  await store.listMovies(store.pageAtual, store.filtrosAtivos, buscaFilme.value)
   mostrarFiltros.value = false
 }
-
 
 const limparFiltros = async () => {
   store.genres.forEach(g => (g.selecionado = false))
   store.filtrosAtivos = []
   buscaGenero.value = ''
+  buscaFilme.value = ''
   store.pageAtual = 1
   await store.listMovies(store.pageAtual, [])
 }
 
+const pesquisarFilme = async () => {
+  store.pageAtual = 1
+  await store.listMovies(1, store.filtrosAtivos, buscaFilme.value)
+}
 
+const onSearchInput = () => {
+  clearTimeout(searchTimer)
+  searchTimer = setTimeout(async () => {
+    store.pageAtual = 1
+    await store.listMovies(1, store.filtrosAtivos, buscaFilme.value)
+  }, 400)
+}
 
 const generosFiltrados = computed(() =>
   store.genres.filter(g => g.name.toLowerCase().includes(buscaGenero.value.toLowerCase()))
@@ -59,26 +82,39 @@ const generosFiltrados = computed(() =>
 
 <template>
   <main>
-    <div class="filtros-container">
-      <button class="botao-filtro" @click="mostrarFiltros = !mostrarFiltros">
-        Filtrar Gêneros ▾
-      </button>
+    <div class="delado">
+      <div class="filtros-container">
+        <button class="botao-filtro" @click="mostrarFiltros = !mostrarFiltros">
+          Filtrar Gêneros ▾
+        </button>
 
-      <div v-if="mostrarFiltros" class="caixa-filtros">
-        <div class="topo-filtro">
-          <h3>Filtros</h3>
-          <button class="botao-limpar" @click="limparFiltros">✕ Limpar</button>
+        <div v-if="mostrarFiltros" class="caixa-filtros">
+          <div class="topo-filtro">
+            <h3>Filtros</h3>
+            <button class="botao-limpar" @click="limparFiltros">✕ Limpar</button>
+          </div>
+
+          <input v-model="buscaGenero" class="campo-busca" placeholder="Pesquisar gênero..." />
+
+          <ul class="lista-filtros">
+            <li v-for="g in generosFiltrados" :key="g.id">
+              <label><input type="checkbox" v-model="g.selecionado" /> {{ g.name }}</label>
+            </li>
+          </ul>
+
+          <button class="botao-aplicar" @click="aplicarFiltros">Aplicar</button>
         </div>
+      </div>
 
-        <input v-model="buscaGenero" class="campo-busca" placeholder="Pesquisar gênero..." />
-
-        <ul class="lista-filtros">
-          <li v-for="g in generosFiltrados" :key="g.id">
-            <label><input type="checkbox" v-model="g.selecionado" /> {{ g.name }}</label>
-          </li>
-        </ul>
-
-        <button class="botao-aplicar" @click="aplicarFiltros">Aplicar</button>
+      <div class="pesquisa">
+        <input
+          type="text"
+          placeholder="Pesquisar filmes..."
+          v-model="buscaFilme"
+          @input="onSearchInput"
+          @keyup.enter.prevent="pesquisarFilme"
+        />
+        <span class="mdi mdi-magnify"></span>
       </div>
     </div>
 
@@ -104,8 +140,7 @@ const generosFiltrados = computed(() =>
         {{ page }}
       </button>
 
-      <button @click="mudarPagina(store.pageAtual + 1)"
-        :disabled="store.pageAtual === store.totalPages">→</button>
+      <button @click="mudarPagina(store.pageAtual + 1)" :disabled="store.pageAtual === store.totalPages">→</button>
     </div>
   </main>
 </template>
@@ -300,7 +335,8 @@ p {
   opacity: 0.4;
   cursor: default;
 }
-.no-poster{
+
+.no-poster {
   background-color: #2e00125e;
   width: 100%;
   height: 83%;
@@ -310,13 +346,59 @@ p {
   justify-content: center;
   text-align: center;
 }
-.no-poster p{
+
+.no-poster p {
   color: white;
   margin-bottom: 5px;
 
 }
-.no-poster .mdi{
+
+.no-poster .mdi {
   color: white;
   font-size: 2rem;
+}
+
+.delado {
+  display: flex;
+  align-items: center;
+  gap: 5vw;
+}
+
+.pesquisa {
+  background: #d3b1b89a;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 7px;
+  padding: 5px 15px;
+  width: 300px;
+  transition: 0.3s ease;
+  margin-bottom: 1.6vw;
+
+}
+
+
+.pesquisa:focus-within {
+  box-shadow: 0 0 0 2px #44001a30;
+}
+
+.pesquisa input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 1.1rem;
+  width: 100%;
+  color: #44001a;
+}
+
+.pesquisa input::placeholder {
+  color: white;
+  opacity: 0.9;
+}
+
+.pesquisa .mdi {
+  color: white;
+  font-size: 1.4rem;
+  margin-left: 8px;
 }
 </style>

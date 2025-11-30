@@ -14,6 +14,8 @@ onMounted(() => {
     store.getTopRatedFilmes();
 });
 
+
+
 </script>
 
 <template>

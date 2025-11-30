@@ -204,7 +204,6 @@ h1 {
   background: #ffffff;
   border-radius: 12px;
   transition: transform .2s ease, box-shadow .2s ease;
-  cursor: pointer;
   margin-bottom: 1vw;
 }
 

@@ -1,12 +1,29 @@
 <script setup>
 import { onMounted } from 'vue';
 import { useActorsStore } from '@/stores/atores';
+import { useRouter } from 'vue-router'
 
 const store = useActorsStore();
 
 onMounted(() => {
     store.getPopularAtores();
 });
+
+
+const router = useRouter()
+
+const irParaDetalhes = (id) => {
+    router.push({
+    path: `/atores/${id}`,
+    query: { from: 'Home' }
+  })
+
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  })
+}
+
 </script>
 
 
@@ -18,7 +35,8 @@ onMounted(() => {
                 <img :src="`https://image.tmdb.org/t/p/w200${ator.profile_path}`" :alt="ator.name" />
                 <h4>{{ ator.name }}</h4>
                 <p>{{ ator.known_for[0].title || ator.known_for[0].name }}</p>
-                <button>Ver mais</button>
+               <button @click="irParaDetalhes(ator.id)">Ver mais</button>
+
             </div>
         </section>
     </main>
