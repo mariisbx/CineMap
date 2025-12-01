@@ -8,6 +8,8 @@ export const useTendenciasStore = defineStore('tendencias', () => {
     const tendencias = ref([]);
     const filmeAtual = ref(null);
     let intervaloRotacao = null;
+    const currentMovie = ref(null);
+    const trailerKey = ref(null);
 
     const getAllTendencias = async (time_window = 'week') => {
         try {
@@ -33,12 +35,12 @@ export const useTendenciasStore = defineStore('tendencias', () => {
         try {
             const tipo = filme.media_type === 'movie' ? 'movie' : 'tv';
             const response = await TMDBapi.get(`${tipo}/${filme.id}`, {
-                params: { language: 'pt-BR', api_key: 'SUA_API_KEY' }
+                params: { language: 'pt-BR', api_key: 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzNGQ5MDY1MzdiZDUxN2Q0YzRlNjI3YmVlNmYwZmJiMCIsIm5iZiI6MTc1OTQ0Mzc0Mi4zODIwMDAyLCJzdWIiOiI2OGRlZmIxZTBkYjJjNDdmMmUzYjhhMTYiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.WdZxeGJU4JZyVewsfZW2SFxSW--WQHb3tMg5jqXarxA' }
             });
             return response.data;
         } catch (error) {
             console.error('Erro ao buscar detalhes:', error);
-            return filme; 
+            return filme;
         }
     };
 
@@ -63,12 +65,37 @@ export const useTendenciasStore = defineStore('tendencias', () => {
     };
 
 
+ const getMovieDetail = async (movieId) => {
+    try {
+      const movieRes = await TMDBapi.get(`/movie/${movieId}`, {
+        params: { language: 'pt-BR' }
+      });
+
+      const videoRes = await TMDBapi.get(`/movie/${movieId}/videos`, {
+        params: { language: 'pt-BR' }
+      });
+
+      currentMovie.value = movieRes.data;
+
+      const trailer = videoRes.data.results.find(
+        v => v.type === 'Trailer' && v.site === 'YouTube'
+      );
+
+      trailerKey.value = trailer ? trailer.key : null;
+
+    } catch (e) {
+      console.error("Erro ao buscar detalhes", e);
+    }
+  }
+
     return {
         tendencias,
         filmeAtual,
         getAllTendencias,
         rotacaoFilmes,
         iniciarRotacao,
-        pararRotacao
+        pararRotacao,
+        currentMovie,
+        getMovieDetail,
     };
 });

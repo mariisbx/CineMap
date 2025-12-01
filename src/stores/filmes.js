@@ -9,18 +9,26 @@ export const useFilmesStore = defineStore('filmes', () => {
   const genres = ref([])
   const totalPages = ref(1)
   const filtrosAtivos = ref([])
-
+  const trailerKey = ref(null)
+  const currentMovie = ref(null)
+  const classificaoIndicativa = ref('')
+  const elenco = ref([])
+  const pageAtual = ref(1)
+  const redesSociais = ref({})
+  const posters = ref([])
+  const recommendations = ref([]) 
+  const buscaFilme = ref('')
 
   const getTopRatedFilmes = async () => {
     try {
       const response = await TMDBapi.get('/movie/top_rated', {
         params: { language: 'pt-BR' },
       })
-       const ordenados = response.data.results
+
+      filmesMaisBemAvaliados.value = response.data.results
         .sort((a, b) => b.vote_average - a.vote_average)
         .slice(0, 3)
 
-      filmesMaisBemAvaliados.value = ordenados
     } catch (error) {
       console.error('Erro ao buscar filmes mais bem avaliados:', error)
     }
@@ -28,30 +36,113 @@ export const useFilmesStore = defineStore('filmes', () => {
 
   const getGenres = async () => {
     try {
-      const response = await TMDBapi.get('/genre/movie/list', { params: { language: 'pt-BR' } })
+      const response = await TMDBapi.get('/genre/movie/list', {
+        params: { language: 'pt-BR' }
+      })
       genres.value = response.data.genres.map(g => ({ ...g, selecionado: false }))
     } catch (error) {
       console.error('Erro ao buscar gêneros:', error)
     }
   }
 
-  const listMovies = async (page = 1, genreIds = []) => {
+ const listMovies = async (page = 1, genreIds = [], query = '') => {
+  try {
+
+    if (query && query.trim() !== '') {
+      filtrosAtivos.value = []
+      genres.value.forEach(g => (g.selecionado = false))
+    }
+
+    const endpoint = query ? '/search/movie' : '/discover/movie'
+
+    const response = await TMDBapi.get(endpoint, {
+      params: {
+        language: 'pt-BR',
+        page,
+        with_genres: query ? undefined : (genreIds.length ? genreIds.join(',') : undefined),
+        query: query || undefined
+      },
+    })
+
+    movies.value = response.data.results || []
+
+    const total = response.data.total_results || 0
+    const pages = Math.ceil(total / 20)
+    totalPages.value = pages > 15 ? 15 : pages
+
+  } catch (error) {
+    console.error('Erro ao listar filmes:', error)
+  }
+}
+
+
+  const getMovieDetail = async (id) => {
     try {
-      const response = await TMDBapi.get('/discover/movie', {
-        params: {
-          language: 'pt-BR',
-          page,
-          with_genres: genreIds.length ? genreIds.join(',') : undefined,
-        },
+      const movieRes = await TMDBapi.get(`/movie/${id}`, {
+        params: { language: 'pt-BR' }
       })
 
-      movies.value = response.data.results || []
+      currentMovie.value = movieRes.data
 
-      const total = response.data.total_results || 0
-      const pages = Math.ceil(total / 20)
-      totalPages.value = pages > 15 ? 15 : pages
-    } catch (error) {
-      console.error('Erro ao listar filmes:', error)
+      const videoRes = await TMDBapi.get(`/movie/${id}/videos`, {
+        params: { language: 'pt-BR' }
+      })
+
+      const trailer = videoRes.data.results.find(
+        v => v.type === 'Trailer' && v.site === 'YouTube'
+      )
+
+      trailerKey.value = trailer ? trailer.key : null
+
+      const releasesRes = await TMDBapi.get(`/movie/${id}/release_dates`)
+      const brRelease = releasesRes.data.results.find(r => r.iso_3166_1 === 'BR')
+
+      if (brRelease && brRelease.release_dates.length > 0) {
+        classificaoIndicativa.value = brRelease.release_dates[0].certification || "Não informado"
+      } else {
+        classificaoIndicativa.value = "Não informado"
+      }
+
+      const creditos = await TMDBapi.get(`/movie/${id}/credits`, {
+        params: { language: 'pt-BR' }
+      })
+
+      elenco.value = creditos.data.cast.slice(0, 15)
+
+      const externalRes = await TMDBapi.get(`/movie/${id}/external_ids`)
+      redesSociais.value = {
+        instagram: externalRes.data.instagram_id,
+        twitter: externalRes.data.twitter_id,
+        facebook: externalRes.data.facebook_id
+      }
+
+      const imagesRes = await TMDBapi.get(`/movie/${id}/images`, {
+        params: { include_image_language: 'en,null,pt' }
+      })
+
+      posters.value = imagesRes.data.posters || []
+
+      getMovieRecommendations(id)
+      
+    } catch (err) {
+      console.error("Erro ao carregar detalhes do filme:", err)
+    }
+  }
+
+  const resetMovie = () => {
+    trailerKey.value = null
+  }
+
+  const getMovieRecommendations = async (id) => {
+    try {
+      const response = await TMDBapi.get(`/movie/${id}/recommendations`, {
+        params: { language: 'pt-BR', page: 1 }
+      })
+
+      recommendations.value = response.data.results || []
+
+    } catch (err) {
+      console.error("Erro ao buscar recomendações:", err)
     }
   }
 
@@ -65,5 +156,17 @@ export const useFilmesStore = defineStore('filmes', () => {
     listMovies,
     getTopRatedFilmes,
     filmesMaisBemAvaliados,
+    currentMovie,
+    trailerKey,
+    getMovieDetail,
+    classificaoIndicativa,
+    elenco,
+    resetMovie,
+    pageAtual,
+    redesSociais,
+    posters,
+    recommendations,
+    getMovieRecommendations,
+    buscaFilme
   }
 })
