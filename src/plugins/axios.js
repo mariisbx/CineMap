@@ -7,4 +7,5 @@ const TMDBapi = axios.create({
   },
 });
 
+
 export default TMDBapi;
