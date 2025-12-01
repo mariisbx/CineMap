@@ -35,8 +35,32 @@ function voltar() {
 </script>
 
 <template>
-<button @click="voltar()">Voltar</button>
+<button @click="voltar()">
+  <span class="mdi mdi-arrow-left"></span>
+  Voltar
+</button>
 
 <AtorBannerComponent/>
 
 </template>
+
+<style scoped>
+button{
+  background-color: white;
+  border: none;
+  font-size: 1.1rem;
+  color: #44001a;
+  margin-left: 6.5rem;
+  align-items: center;
+  margin-top: 1vw ;
+  margin-bottom: 1vw;
+  cursor: pointer;
+}
+button:hover{
+  color: #aa0041;
+  transition: 1s;
+}
+.mdi{
+  font-size: 1.3rem;
+}
+</style>

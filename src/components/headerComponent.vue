@@ -173,7 +173,7 @@ ul li a.router-link-exact-active {
 
 .aba-info {
     position: fixed;
-    top: 5px;
+    top: 40px;
     right: 50px;
     width: 350px;
     background: #fdf9f7;

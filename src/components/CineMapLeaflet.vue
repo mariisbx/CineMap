@@ -58,7 +58,7 @@ async function buscarFilmesDoPais(code) {
     const p1 = await buscarPagina(1);
     const p2 = await buscarPagina(2);
     filmes.push(...p1, ...p2);
-  } catch {}
+  } catch { }
 
   return filmes.slice(0, 100);
 }
@@ -132,12 +132,7 @@ onMounted(async () => {
 
     <div v-else class="content">
       <div class="search-bar">
-        <input
-          v-model="search"
-          @input="filtrarPaises"
-          type="text"
-          placeholder="Buscar país..."
-        />
+        <input v-model="search" @input="filtrarPaises" type="text" placeholder="Buscar país..." />
       </div>
 
       <ul v-if="filteredCountries.length" class="dropdown-on-map">
@@ -150,13 +145,8 @@ onMounted(async () => {
         <LMap :zoom="zoom" :center="center" :key="center.toString()">
           <LTileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-          <LMarker
-            v-for="pais in countriesList"
-            :key="pais.iso"
-            :lat-lng="pais.coords"
-            :icon="getIcon()"
-            @click="selecionarPais(pais)"
-          >
+          <LMarker v-for="pais in countriesList" :key="pais.iso" :lat-lng="pais.coords" :icon="getIcon()"
+            @click="selecionarPais(pais)">
             <LPopup>
               <div class="popup-content">
                 <img :src="pais.flag" class="flag-popup" />
@@ -170,25 +160,25 @@ onMounted(async () => {
       <div v-if="filmesSelecionados" class="lista-filmes">
         <h3>{{ filmesSelecionados.nome }}</h3>
 
+        <div v-if="filmesSelecionados.filmes.length === 0" class="sem-filmes">
+          <span class="mdi mdi-alert-circle-outline"></span>
+          <p>Este país não possui filmes cadastrados no momento.</p>
+        </div>
+
         <div class="grid-filmes">
           <div v-for="filme in filmesPaginados" :key="filme.id" class="card-filme">
-            <img
-              v-if="filme.poster"
-              :src="filme.poster"
-              class="poster"
-              alt=""
-            />
+            <img v-if="filme.poster" :src="filme.poster" class="poster" alt="" />
+            <div v-if="!filme.poster" class="no-poster">
+              <span class="mdi mdi-movie"></span>
+              <p>Sem imagem disponível</p>
+            </div>
+
             <div class="titulo">{{ filme.titulo }}</div>
           </div>
         </div>
 
         <div class="pagination" v-if="totalPaginas > 1">
-          <button
-            v-for="p in totalPaginas"
-            :key="p"
-            @click="mudarPagina(p)"
-            :class="{ active: paginaAtual === p }"
-          >
+          <button v-for="p in totalPaginas" :key="p" @click="mudarPagina(p)" :class="{ active: paginaAtual === p }">
             {{ p }}
           </button>
         </div>
@@ -296,13 +286,10 @@ onMounted(async () => {
   --bg-size: 400%;
   --color-one: #44001a;
   --color-two: #aa0041;
-  background: linear-gradient(
-      90deg,
+  background: linear-gradient(90deg,
       var(--color-one),
       var(--color-two),
-      var(--color-one)
-    )
-    0 0 / var(--bg-size) 100%;
+      var(--color-one)) 0 0 / var(--bg-size) 100%;
   color: transparent;
   -webkit-background-clip: text;
   background-clip: text;
@@ -311,8 +298,13 @@ onMounted(async () => {
 }
 
 @keyframes move-bg {
-  0% { background-position: 0 0; }
-  100% { background-position: var(--bg-size) 0; }
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: var(--bg-size) 0;
+  }
 }
 
 .grid-filmes {
@@ -320,7 +312,7 @@ onMounted(async () => {
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 90px;
   justify-content: center;
-  margin: 0 10vw 0 6vw ;
+  margin: 0 10vw 0 6vw;
 }
 
 .card-filme {
@@ -384,6 +376,37 @@ onMounted(async () => {
   opacity: 0.4;
   cursor: default;
 }
+
+.no-poster {
+  background-color: #2e00125e;
+  height: 40vh;
+  width: 250px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  color: white;
+}
+
+.mdi {
+  font-size: 1.5rem;
+}
+.sem-filmes {
+  height: 30vh;
+  display: flex;
+  align-items: center;
+  color: #44001a;
+  font-size: 1.2rem;
+  margin: 0 6.5vw;
+  gap: 10px;
+  margin-top: -5vw;
+}
+
+.sem-filmes .mdi {
+  font-size: 2rem;
+}
+
 </style>
 
 <style>

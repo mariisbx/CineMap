@@ -4,11 +4,16 @@ const store = useFilmesStore()
 </script>
 
 <template>
-  <section class="banner" :style="{
-    backgroundImage: store.currentMovie?.backdrop_path
-      ? `linear-gradient(to right, rgba(0,0,0,0.7), rgba(0,0,0,0)), url('https://image.tmdb.org/t/p/original${store.currentMovie.backdrop_path}')`
-      : ''
-  }">
+<section
+  class="banner"
+  :style="store.currentMovie?.backdrop_path
+    ? {
+        backgroundImage: `linear-gradient(to right, rgba(0,0,0,0.7), rgba(0,0,0,0)), url('https://image.tmdb.org/t/p/original${store.currentMovie.backdrop_path}')`
+      }
+    : {
+        backgroundColor: '#44001ab9'
+      }"
+>
 
     <section class="principal">
       <h1>{{ store.currentMovie.title }} ({{ store.currentMovie.release_date.slice(0, 4) }})</h1>
