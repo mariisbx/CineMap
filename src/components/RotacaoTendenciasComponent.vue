@@ -1,6 +1,12 @@
 <script setup>
 import { useTendenciasStore } from '@/stores/tendencias';
 import { onMounted, onBeforeUnmount } from 'vue';
+import { useRouter } from 'vue-router';
+const router = useRouter()
+
+const openMovie = (id) => {
+  router.push({ name: 'DetalhesFilmes', params: { movieId: id } })
+}
 
 
 const store = useTendenciasStore();
@@ -34,11 +40,9 @@ onBeforeUnmount(() => {
                     </div>
 
                 </div>
-                 <button>Ver Filme</button>
+                 <button @click="openMovie(store.filmeAtual.id)" class="ver">Ver</button>
             </div>
-
         </div>
-
     </section>
 
 </template>

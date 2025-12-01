@@ -2,10 +2,19 @@
 import { onMounted } from 'vue';
 import { useFilmesStore } from '@/stores/filmes';
 const store = useFilmesStore();
+import { useRouter } from 'vue-router';
+const router = useRouter()
+
+const openMovie = (id) => {
+    router.push({ name: 'DetalhesFilmes', params: { movieId: id } })
+}
+
 
 onMounted(() => {
     store.getTopRatedFilmes();
 });
+
+
 
 </script>
 
@@ -19,7 +28,7 @@ onMounted(() => {
                     <div class="informacao">
                         <p class="titulo">{{ filme.title }}</p>
                         <p class="data">{{ filme.release_date }}</p>
-                        <button>Ver mais</button>
+                        <button @click="openMovie(filme.id)" class="ver">Ver</button>
                     </div>
 
                     <div class="progresso" :style="{
@@ -37,31 +46,34 @@ onMounted(() => {
 </template>
 
 <style scoped>
+h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    --bg-size: 400%;
+    --color-one: #44001a;
+    --color-two: #aa0041;
+    background: linear-gradient(90deg,
+            var(--color-one),
+            var(--color-two),
+            var(--color-one)) 0 0 / var(--bg-size) 100%;
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: move-bg 8s infinite linear;
+    text-align: center;
+    margin-top: 2vw;
+}
 
-h1{
-  font-size: 2rem;
-  font-weight: 700;
-  --bg-size: 400%;
-  --color-one: #44001a;
-  --color-two: #aa0041;
-  background: linear-gradient(
-      90deg,
-      var(--color-one),
-      var(--color-two),
-      var(--color-one)
-    )
-    0 0 / var(--bg-size) 100%;
-  color: transparent;
-  -webkit-background-clip: text;
-  background-clip: text;
-  animation: move-bg 8s infinite linear;
-  text-align: center;
-  margin-top: 2vw;
-}
 @keyframes move-bg {
-  0% { background-position: 0 0; }
-  100% { background-position: var(--bg-size) 0; }
+    0% {
+        background-position: 0 0;
+    }
+
+    100% {
+        background-position: var(--bg-size) 0;
+    }
 }
+
 .progresso {
     width: 60px;
     height: 60px;
@@ -92,30 +104,34 @@ h1{
     z-index: 2;
 }
 
-ul{
+ul {
     display: flex;
     margin: 2vw 9vw;
     justify-content: center;
-      gap: 10vw; 
+    gap: 10vw;
     align-items: center;
 }
-ul li:first-child{
+
+ul li:first-child {
     font-size: 1.2rem;
-    
-    & img{
+
+    & img {
         width: 300px;
-        height: auto;   
+        height: auto;
     }
-    & .informacao{
+
+    & .informacao {
         width: 230px;
-    }   
+    }
 }
-ul li img{
+
+ul li img {
     width: 250px;
-    height: auto;   
+    height: auto;
     border-radius: 8px;
 
 }
+
 .lado {
     display: flex;
     justify-content: flex-start;
@@ -123,21 +139,26 @@ ul li img{
     margin-top: 10px;
     gap: 15px;
 }
-.informacao{
+
+.informacao {
     width: 170px;
 }
-.informacao p{
-     width: 100%; 
+
+.informacao p {
+    width: 100%;
 }
-.titulo{
+
+.titulo {
     font-weight: 700;
 
 }
-.data{
-    color:#44001aa9;
+
+.data {
+    color: #44001aa9;
     margin-top: 10px;
 }
-button{
+
+button {
     margin-top: 15px;
     padding: 6px 20px;
     border-radius: 6px;
@@ -147,7 +168,8 @@ button{
     border: none;
     cursor: pointer;
 }
-button:hover{
+
+button:hover {
     background-color: #2e0012;
     transition: 0.5s;
 }

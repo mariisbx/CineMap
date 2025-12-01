@@ -1,12 +1,29 @@
 <script setup>
 import { onMounted } from 'vue';
 import { useActorsStore } from '@/stores/atores';
+import { useRouter } from 'vue-router'
 
 const store = useActorsStore();
 
 onMounted(() => {
     store.getPopularAtores();
 });
+
+
+const router = useRouter()
+
+const irParaDetalhes = (id) => {
+    router.push({
+    path: `/atores/${id}`,
+    query: { from: 'Home' }
+  })
+
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  })
+}
+
 </script>
 
 
@@ -18,7 +35,8 @@ onMounted(() => {
                 <img :src="`https://image.tmdb.org/t/p/w200${ator.profile_path}`" :alt="ator.name" />
                 <h4>{{ ator.name }}</h4>
                 <p>{{ ator.known_for[0].title || ator.known_for[0].name }}</p>
-                <button>Ver mais</button>
+               <button @click="irParaDetalhes(ator.id)">Ver mais</button>
+
             </div>
         </section>
     </main>
@@ -55,13 +73,14 @@ h1{
 }
 
 section{
-       display: flex;
+    display: flex;
     justify-content: center;
     gap: 5vw;
     overflow-x: auto;
     padding: 40px;
     color: white;
 }
+
 img {
     width: 240px;
 }
@@ -79,15 +98,28 @@ button{
     border-radius: 6px;
     border: none;
     color: #44001a;
-    width: 100%;
-    padding: 3px 10px;
+    width: 90%;
+    padding: 3px 7px;
     font-size: 1.04rem;
     cursor: pointer;
     font-weight: 600;
+    margin-top: auto;
 }
 button:hover{
     background-color: #b17b88;
     color: white;
     transition: 0.5s;
+    align-items: center;
 }
+.ator-card {
+    display: flex;
+    flex-direction: column;
+
+    /* Para todos terem a mesma altura */
+    min-height: 380px;
+
+    /* Mantém eles proporcionais */
+    width: 15%;
+}
+
 </style>

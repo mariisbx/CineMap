@@ -1,6 +1,12 @@
 <script setup>
 import { useTendenciasStore } from '@/stores/tendencias';
 import { onMounted, computed } from 'vue';
+import { useRouter } from 'vue-router';
+const router = useRouter()
+
+const openMovie = (id) => {
+  router.push({ name: 'DetalhesFilmes', params: { movieId: id } })
+}
 
 const store = useTendenciasStore();
 
@@ -25,7 +31,7 @@ const filmes = computed(() => store.tendencias.filter(item => item.title));
           <p class="titulo">{{ filme.title }}</p>
           <div class="informacao">
             <p>{{ filme.release_date }}</p>
-            <p class="ver">Ver</p>
+            <button @click="openMovie(filme.id)" class="ver">Ver</button>
           </div>
         </div>
       </div>
