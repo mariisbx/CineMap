@@ -27,7 +27,7 @@ const route = useRoute()
     <h1>Elenco principal</h1>
 
     <ul>
-      <li v-for="ator in store.elenco" :key="ator.id" @click="irParaAtor(ator.id)">
+      <li v-for="ator in store.elenco" :key="ator.id">
         <img
           :src="ator.profile_path ? 'https://image.tmdb.org/t/p/w500' + ator.profile_path : '/images/AtorSemFoto.avif'">
         <p class="ator">{{ ator.name }}</p>
